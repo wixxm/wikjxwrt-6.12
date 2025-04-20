@@ -189,18 +189,6 @@ fi
 # tags
 git branch | awk '{print $2}' > version.txt
 
-# feeds mirror
-packages=";$branch"
-luci=";$branch"
-routing=";$branch"
-telephony=";$branch"
-
-cat > feeds.conf <<EOF
-src-git packages https://$github/openwrt/packages.git$packages
-src-git luci https://$github/openwrt/luci.git$luci
-src-git routing https://$github/openwrt/routing.git$routing
-src-git telephony https://$github/openwrt/telephony.git$telephony
-EOF
 
 # Init feeds
 [ "$(whoami)" = "runner" ] && group "feeds update -a"
