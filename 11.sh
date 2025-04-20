@@ -1,69 +1,3 @@
-#!/bin/bash -e
-export RED_COLOR='\e[1;31m'
-export GREEN_COLOR='\e[1;32m'
-export YELLOW_COLOR='\e[1;33m'
-export BLUE_COLOR='\e[1;34m'
-export PINK_COLOR='\e[1;35m'
-export SHAN='\e[1;33;5m'
-export RES='\e[0m'
-
-GROUP=
-group() {
-    endgroup
-    echo "::group::  $1"
-    GROUP=1
-}
-endgroup() {
-    if [ -n "$GROUP" ]; then
-        echo "::endgroup::"
-    fi
-    GROUP=
-}
-
-# check
-if [ "$(whoami)" != "sbwml" ] && [ -z "$git_name" ] && [ -z "$git_password" ]; then
-    echo -e "\n${RED_COLOR} Not authorized. Execute the following command to provide authorization information:${RES}\n"
-    echo -e "${BLUE_COLOR} export git_name=your_username git_password=your_password${RES}\n"
-    exit 1
-fi
-
-#####################################
-#  NanoPi R4S OpenWrt Build Script  #
-#####################################
-
-# IP Location
-ip_info=`curl -sk https://ip.cooluc.com`;
-[ -n "$ip_info" ] && export isCN=`echo $ip_info | grep -Po 'country_code\":"\K[^"]+'` || export isCN=US
-
-# script url
-if [ "$isCN" = "CN" ]; then
-    export mirror=https://init.cooluc.com
-else
-    export mirror=https://init2.cooluc.com
-fi
-
-# github actions - caddy server
-if [ "$(whoami)" = "runner" ] && [ "$git_name" != "private" ]; then
-    export mirror=http://127.0.0.1:8080
-fi
-
-# private gitea
-export gitea=git.cooluc.com
-
-# github mirror
-if [ "$isCN" = "CN" ]; then
-    # There is currently no stable gh proxy
-    export github="github.com"
-else
-    export github="github.com"
-fi
-
-# Check root
-if [ "$(id -u)" = "0" ]; then
-    echo -e "${RED_COLOR}Building with root user is not supported.${RES}"
-    exit 1
-fi
-
 # Start time
 starttime=`date +'%Y-%m-%d %H:%M:%S'`
 CURRENT_DATE=$(date +%s)
@@ -76,6 +10,7 @@ if curl --help | grep progress-bar >/dev/null 2>&1; then
     CURL_BAR="--progress-bar";
 fi
 
+# 检查参数
 if [ -z "$1" ] || [ "$2" != "nanopi-r4s" -a "$2" != "nanopi-r5s" -a "$2" != "x86_64" -a "$2" != "netgear_r8500" -a "$2" != "armv8" ]; then
     echo -e "\n${RED_COLOR}Building type not specified.${RES}\n"
     echo -e "Usage:\n"
@@ -92,17 +27,11 @@ if [ -z "$1" ] || [ "$2" != "nanopi-r4s" -a "$2" != "nanopi-r5s" -a "$2" != "x86
     exit 1
 fi
 
-# Source branch
-if [ "$1" = "dev" ]; then
-    export branch=main
-    export version=dev
-elif [ "$1" = "rc2" ]; then
-    latest_release="v$(curl -s $mirror/tags/v24)"
-    export branch=main  # 固定为 main 分支
-    export version=rc2
-fi
+# 固定使用 main 分支，不再区分 rc2/dev
+export branch=main
+export version=$1
 
-# lan
+# LAN
 [ -n "$LAN" ] && export LAN=$LAN || export LAN=10.0.0.1
 
 # platform
@@ -112,7 +41,7 @@ fi
 [ "$2" = "netgear_r8500" ] && export platform="bcm53xx" toolchain_arch="arm_cortex-a9"
 [ "$2" = "x86_64" ] && export platform="x86_64" toolchain_arch="x86_64"
 
-# gcc14 & 15
+# gcc
 if [ "$USE_GCC13" = y ]; then
     export USE_GCC13=y gcc_version=13
 elif [ "$USE_GCC14" = y ]; then
@@ -149,6 +78,8 @@ else
     echo -e "${GREEN_COLOR}Model: nanopi-r4s${RES}"
     [ "$1" = "rc2" ] && model="nanopi-r4s"
 fi
+
+# kernel
 get_kernel_version=$(curl -s $mirror/tags/kernel-6.12)
 kmod_hash=$(echo -e "$get_kernel_version" | awk -F'HASH-' '{print $2}' | awk '{print $1}' | tail -1 | md5sum | awk '{print $1}')
 kmodpkg_name=$(echo $(echo -e "$get_kernel_version" | awk -F'HASH-' '{print $2}' | awk '{print $1}')~$(echo $kmod_hash)-r1)
@@ -170,15 +101,16 @@ echo -e "${GREEN_COLOR}GCC VERSION: $gcc_version${RES}"
 [ "$MINIMAL_BUILD" = "y" ] && echo -e "${GREEN_COLOR}MINIMAL_BUILD: true${RES}" || echo -e "${GREEN_COLOR}MINIMAL_BUILD: false${RES}"
 [ "$KERNEL_CLANG_LTO" = "y" ] && echo -e "${GREEN_COLOR}KERNEL_CLANG_LTO: true${RES}\r\n" || echo -e "${GREEN_COLOR}KERNEL_CLANG_LTO:${RES} ${YELLOW_COLOR}false${RES}\r\n"
 
-# clean old files
+# 清理旧文件
 rm -rf openwrt master
 
-# openwrt - releases
+# 克隆源码
 [ "$(whoami)" = "runner" ] && group "source code"
-git clone --depth=1 https://github.com/wixxm/OpenWrt-24.10 -b $branch openwrt  # 替换为你的仓库地址
-# immortalwrt master
-git clone https://github.com/wixxm/OpenWrt-24.10.git master/immortalwrt_packages --depth=1  # 同样替换
+git clone --depth=1 https://github.com/wixxm/OpenWrt-24.10.git -b main openwrt
 [ "$(whoami)" = "runner" ] && endgroup
+
+# immortalwrt packages
+git clone https://$github/immortalwrt/packages master/immortalwrt_packages --depth=1
 
 if [ -d openwrt ]; then
     cd openwrt
@@ -189,10 +121,33 @@ else
 fi
 
 # tags
-if [ "$1" = "rc2" ]; then
-    git describe --abbrev=0 --tags > version.txt
-else
-    git branch | awk '{print $2}' > version.txt
+git branch | awk '{print $2}' > version.txt
+
+# feeds mirror
+packages=";$branch"
+luci=";$branch"
+routing=";$branch"
+telephony=";$branch"
+
+cat > feeds.conf <<EOF
+src-git packages https://$github/openwrt/packages.git$packages
+src-git luci https://$github/openwrt/luci.git$luci
+src-git routing https://$github/openwrt/routing.git$routing
+src-git telephony https://$github/openwrt/telephony.git$telephony
+EOF
+
+# Init feeds
+[ "$(whoami)" = "runner" ] && group "feeds update -a"
+./scripts/feeds update -a
+[ "$(whoami)" = "runner" ] && endgroup
+
+[ "$(whoami)" = "runner" ] && group "feeds install -a"
+./scripts/feeds install -a
+[ "$(whoami)" = "runner" ] && endgroup
+
+# loader dl
+if [ -f ../dl.gz ]; then
+    tar xf ../dl.gz -C .
 fi
 
 ###############################################
