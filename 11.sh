@@ -1,3 +1,69 @@
+#!/bin/bash -e
+export RED_COLOR='\e[1;31m'
+export GREEN_COLOR='\e[1;32m'
+export YELLOW_COLOR='\e[1;33m'
+export BLUE_COLOR='\e[1;34m'
+export PINK_COLOR='\e[1;35m'
+export SHAN='\e[1;33;5m'
+export RES='\e[0m'
+
+GROUP=
+group() {
+    endgroup
+    echo "::group::  $1"
+    GROUP=1
+}
+endgroup() {
+    if [ -n "$GROUP" ]; then
+        echo "::endgroup::"
+    fi
+    GROUP=
+}
+
+# check
+if [ "$(whoami)" != "sbwml" ] && [ -z "$git_name" ] && [ -z "$git_password" ]; then
+    echo -e "\n${RED_COLOR} Not authorized. Execute the following command to provide authorization information:${RES}\n"
+    echo -e "${BLUE_COLOR} export git_name=your_username git_password=your_password${RES}\n"
+    exit 1
+fi
+
+#####################################
+#  NanoPi R4S OpenWrt Build Script  #
+#####################################
+
+# IP Location
+ip_info=`curl -sk https://ip.cooluc.com`;
+[ -n "$ip_info" ] && export isCN=`echo $ip_info | grep -Po 'country_code\":"\K[^"]+'` || export isCN=US
+
+# script url
+if [ "$isCN" = "CN" ]; then
+    export mirror=https://init.cooluc.com
+else
+    export mirror=https://init2.cooluc.com
+fi
+
+# github actions - caddy server
+if [ "$(whoami)" = "runner" ] && [ "$git_name" != "private" ]; then
+    export mirror=http://127.0.0.1:8080
+fi
+
+# private gitea
+export gitea=git.cooluc.com
+
+# github mirror
+if [ "$isCN" = "CN" ]; then
+    # There is currently no stable gh proxy
+    export github="github.com"
+else
+    export github="github.com"
+fi
+
+# Check root
+if [ "$(id -u)" = "0" ]; then
+    echo -e "${RED_COLOR}Building with root user is not supported.${RES}"
+    exit 1
+fi
+
 # Start time
 starttime=`date +'%Y-%m-%d %H:%M:%S'`
 CURRENT_DATE=$(date +%s)
