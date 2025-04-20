@@ -94,11 +94,11 @@ fi
 
 # Source branch
 if [ "$1" = "dev" ]; then
-    export branch=openwrt-24.10
+    export branch=main
     export version=dev
 elif [ "$1" = "rc2" ]; then
     latest_release="v$(curl -s $mirror/tags/v24)"
-    export branch=$latest_release
+    export branch=main  # 固定为 main 分支
     export version=rc2
 fi
 
@@ -175,10 +175,9 @@ rm -rf openwrt master
 
 # openwrt - releases
 [ "$(whoami)" = "runner" ] && group "source code"
-git clone --depth=1 https://$github/openwrt/openwrt -b $branch
-
+git clone --depth=1 https://github.com/wixxm/OpenWrt-24.10 -b $branch openwrt  # 替换为你的仓库地址
 # immortalwrt master
-git clone https://$github/immortalwrt/packages master/immortalwrt_packages --depth=1
+git clone https://github.com/wixxm/OpenWrt-24.10.git master/immortalwrt_packages --depth=1  # 同样替换
 [ "$(whoami)" = "runner" ] && endgroup
 
 if [ -d openwrt ]; then
@@ -194,39 +193,6 @@ if [ "$1" = "rc2" ]; then
     git describe --abbrev=0 --tags > version.txt
 else
     git branch | awk '{print $2}' > version.txt
-fi
-
-# feeds mirror
-if [ "$1" = "rc2" ]; then
-    packages="^$(grep packages feeds.conf.default | awk -F^ '{print $2}')"
-    luci="^$(grep luci feeds.conf.default | awk -F^ '{print $2}')"
-    routing="^$(grep routing feeds.conf.default | awk -F^ '{print $2}')"
-    telephony="^$(grep telephony feeds.conf.default | awk -F^ '{print $2}')"
-else
-    packages=";$branch"
-    luci=";$branch"
-    routing=";$branch"
-    telephony=";$branch"
-fi
-cat > feeds.conf <<EOF
-src-git packages https://$github/openwrt/packages.git$packages
-src-git luci https://$github/openwrt/luci.git$luci
-src-git routing https://$github/openwrt/routing.git$routing
-src-git telephony https://$github/openwrt/telephony.git$telephony
-EOF
-
-# Init feeds
-[ "$(whoami)" = "runner" ] && group "feeds update -a"
-./scripts/feeds update -a
-[ "$(whoami)" = "runner" ] && endgroup
-
-[ "$(whoami)" = "runner" ] && group "feeds install -a"
-./scripts/feeds install -a
-[ "$(whoami)" = "runner" ] && endgroup
-
-# loader dl
-if [ -f ../dl.gz ]; then
-    tar xf ../dl.gz -C .
 fi
 
 ###############################################
