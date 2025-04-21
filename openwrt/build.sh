@@ -198,10 +198,10 @@ fi
 git branch | awk '{print $2}' > version.txt
 
 # feeds 处理
-info "检查和修改 $FEEDS_FILE..."
+info "检查和修改 feeds.conf.default..."
 for entry in "$WIKJXWRT_ENTRY" "$PASSWALL_PACKAGES_ENTRY" "$PASSWALL_ENTRY"; do
-    if ! grep -q "^$entry" "$FEEDS_FILE"; then
-        echo "$entry" >>"$FEEDS_FILE"
+    if ! grep -q "^$entry" "feeds.conf.default"; then
+        echo "$entry" >> "feeds.conf.default"
         echo -e "$ICON_SUCCESS 添加自定义 feeds: $entry"
     else
         echo -e "$ICON_WARN feeds 已存在: $entry，无需重复添加。"
@@ -219,7 +219,7 @@ done
 
 # 注释自定义 feeds
 for entry in "$WIKJXWRT_ENTRY" "$PASSWALL_PACKAGES_ENTRY" "$PASSWALL_ENTRY"; do
-    sed -i "s|^$entry|#$entry|" "$FEEDS_FILE" || error "注释自定义 feeds 失败: $entry"
+    sed -i "s|^$entry|#$entry|" "feeds.conf.default" || error "注释自定义 feeds 失败: $entry"
 done
 
 # loader dl
