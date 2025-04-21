@@ -394,7 +394,7 @@ fi
 # Compile
 if [ "$BUILD_TOOLCHAIN" = "y" ]; then
     echo -e "\r\n${GREEN_COLOR}Building Toolchain ...${RES}\r\n"
-    make -j$cores toolchain/compile V=s || make -j$cores toolchain/compile V=s || exit 1
+    make -j$cores toolchain/compile || make -j$cores toolchain/compile V=s || exit 1
     mkdir -p toolchain-cache
     [ "$ENABLE_GLIBC" = "y" ] && LIBC=glibc || LIBC=musl
     tar -I "zstd -19 -T$(nproc --all)" -cf toolchain-cache/toolchain_${LIBC}_${toolchain_arch}_gcc-${gcc_version}${tools_suffix}.tar.zst ./{build_dir,dl,staging_dir,tmp}
