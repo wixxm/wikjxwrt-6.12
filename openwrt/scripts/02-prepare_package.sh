@@ -82,10 +82,6 @@ sed -i 's/0666/0644/g;s/0777/0755/g' feeds/packages/net/samba4/files/smb.conf.te
 # netkit-ftp
 git clone https://$github/sbwml/package_new_ftp package/new/ftp
 
-# SSRP & Passwall
-rm -rf feeds/packages/net/{xray-core,v2ray-core,v2ray-geodata,sing-box}
-git clone https://$github/sbwml/openwrt_helloworld package/new/helloworld -b v5
-
 # iperf3
 sed -i "s/D_GNU_SOURCE/D_GNU_SOURCE -funroll-loops/g" feeds/packages/net/iperf3/Makefile
 
