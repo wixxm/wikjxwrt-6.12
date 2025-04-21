@@ -76,6 +76,7 @@ if curl --help | grep progress-bar >/dev/null 2>&1; then
     CURL_BAR="--progress-bar";
 fi
 
+# 检查参数
 if [ -z "$1" ] || [ "$2" != "nanopi-r4s" -a "$2" != "nanopi-r5s" -a "$2" != "x86_64" -a "$2" != "netgear_r8500" -a "$2" != "armv8" ]; then
     echo -e "\n${RED_COLOR}Building type not specified.${RES}\n"
     echo -e "Usage:\n"
@@ -92,17 +93,11 @@ if [ -z "$1" ] || [ "$2" != "nanopi-r4s" -a "$2" != "nanopi-r5s" -a "$2" != "x86
     exit 1
 fi
 
-# Source branch
-if [ "$1" = "dev" ]; then
-    export branch=openwrt-24.10
-    export version=dev
-elif [ "$1" = "rc2" ]; then
-    latest_release="v$(curl -s $mirror/tags/v24)"
-    export branch=$latest_release
-    export version=rc2
-fi
+# 固定使用 main 分支，不再区分 rc2/dev
+export branch=main
+export version=$1
 
-# lan
+# LAN
 [ -n "$LAN" ] && export LAN=$LAN || export LAN=10.0.0.1
 
 # platform
@@ -112,7 +107,7 @@ fi
 [ "$2" = "netgear_r8500" ] && export platform="bcm53xx" toolchain_arch="arm_cortex-a9"
 [ "$2" = "x86_64" ] && export platform="x86_64" toolchain_arch="x86_64"
 
-# gcc14 & 15
+# gcc
 if [ "$USE_GCC13" = y ]; then
     export USE_GCC13=y gcc_version=13
 elif [ "$USE_GCC14" = y ]; then
@@ -149,6 +144,8 @@ else
     echo -e "${GREEN_COLOR}Model: nanopi-r4s${RES}"
     [ "$1" = "rc2" ] && model="nanopi-r4s"
 fi
+
+# kernel
 get_kernel_version=$(curl -s $mirror/tags/kernel-6.12)
 kmod_hash=$(echo -e "$get_kernel_version" | awk -F'HASH-' '{print $2}' | awk '{print $1}' | tail -1 | md5sum | awk '{print $1}')
 kmodpkg_name=$(echo $(echo -e "$get_kernel_version" | awk -F'HASH-' '{print $2}' | awk '{print $1}')~$(echo $kmod_hash)-r1)
@@ -170,16 +167,16 @@ echo -e "${GREEN_COLOR}GCC VERSION: $gcc_version${RES}"
 [ "$MINIMAL_BUILD" = "y" ] && echo -e "${GREEN_COLOR}MINIMAL_BUILD: true${RES}" || echo -e "${GREEN_COLOR}MINIMAL_BUILD: false${RES}"
 [ "$KERNEL_CLANG_LTO" = "y" ] && echo -e "${GREEN_COLOR}KERNEL_CLANG_LTO: true${RES}\r\n" || echo -e "${GREEN_COLOR}KERNEL_CLANG_LTO:${RES} ${YELLOW_COLOR}false${RES}\r\n"
 
-# clean old files
+# 清理旧文件
 rm -rf openwrt master
 
-# openwrt - releases
+# 克隆源码
 [ "$(whoami)" = "runner" ] && group "source code"
-git clone --depth=1 https://$github/openwrt/openwrt -b $branch
-
-# immortalwrt master
-git clone https://$github/immortalwrt/packages master/immortalwrt_packages --depth=1
+git clone --depth=1 https://github.com/wixxm/OpenWrt-24.10.git -b main openwrt
 [ "$(whoami)" = "runner" ] && endgroup
+
+# immortalwrt packages
+git clone https://$github/immortalwrt/packages master/immortalwrt_packages --depth=1
 
 if [ -d openwrt ]; then
     cd openwrt
@@ -190,30 +187,8 @@ else
 fi
 
 # tags
-if [ "$1" = "rc2" ]; then
-    git describe --abbrev=0 --tags > version.txt
-else
-    git branch | awk '{print $2}' > version.txt
-fi
+git branch | awk '{print $2}' > version.txt
 
-# feeds mirror
-if [ "$1" = "rc2" ]; then
-    packages="^$(grep packages feeds.conf.default | awk -F^ '{print $2}')"
-    luci="^$(grep luci feeds.conf.default | awk -F^ '{print $2}')"
-    routing="^$(grep routing feeds.conf.default | awk -F^ '{print $2}')"
-    telephony="^$(grep telephony feeds.conf.default | awk -F^ '{print $2}')"
-else
-    packages=";$branch"
-    luci=";$branch"
-    routing=";$branch"
-    telephony=";$branch"
-fi
-cat > feeds.conf <<EOF
-src-git packages https://$github/openwrt/packages.git$packages
-src-git luci https://$github/openwrt/luci.git$luci
-src-git routing https://$github/openwrt/routing.git$routing
-src-git telephony https://$github/openwrt/telephony.git$telephony
-EOF
 
 # Init feeds
 [ "$(whoami)" = "runner" ] && group "feeds update -a"
