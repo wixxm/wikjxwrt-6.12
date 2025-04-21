@@ -96,6 +96,12 @@ git clone https://github.com/sbwml/luci-app-mentohust package/new/mentohust
 rm -rf feeds/packages/utils/coremark
 git clone https://github.com/wixxm/wikjxwrt-coremark feeds/packages/utils/coremark
 
+# sysinfo ssh
+git clone https://github.com/wixxm/WikjxWrt-ssh temp_ssh_repo
+mkdir -p "$(dirname /feeds/packages/utils/bash/files/etc/profile.d/sysinfo.sh)"
+mv temp_ssh_repo/sysinfo.sh /feeds/packages/utils/bash/files/etc/profile.d/sysinfo.sh
+rm -rf temp_ssh_repo
+
 # luci-compat - fix translation
 sed -i 's/<%:Up%>/<%:Move up%>/g' feeds/luci/modules/luci-compat/luasrc/view/cbi/tblsection.htm
 sed -i 's/<%:Down%>/<%:Move down%>/g' feeds/luci/modules/luci-compat/luasrc/view/cbi/tblsection.htm
