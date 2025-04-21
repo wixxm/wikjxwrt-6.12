@@ -102,6 +102,9 @@ fi
 export branch=main
 export version=$1
 
+# 通过 export 设置 LAN 的值
+export LAN="192.168.88.1"
+
 # LAN
 [ -n "$LAN" ] && export LAN=$LAN || export LAN=10.0.0.1
 
