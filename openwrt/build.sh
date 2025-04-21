@@ -58,6 +58,11 @@ else
     export github="github.com"
 fi
 
+# 自定义 feeds 定义
+export WIKJXWRT_ENTRY="src-git wikjxwrt https://github.com/wixxm/wikjxwrt-feeds"
+export PASSWALL_PACKAGES_ENTRY="src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall-packages.git;main"
+export PASSWALL_ENTRY="src-git passwall https://github.com/xiaorouji/openwrt-passwall.git;main"
+
 # Check root
 if [ "$(id -u)" = "0" ]; then
     echo -e "${RED_COLOR}Building with root user is not supported.${RES}"
@@ -189,6 +194,16 @@ fi
 # tags
 git branch | awk '{print $2}' > version.txt
 
+# feeds 处理
+info "检查和修改 $FEEDS_FILE..."
+for entry in "$WIKJXWRT_ENTRY" "$PASSWALL_PACKAGES_ENTRY" "$PASSWALL_ENTRY"; do
+    if ! grep -q "^$entry" "$FEEDS_FILE"; then
+        echo "$entry" >>"$FEEDS_FILE"
+        echo -e "$ICON_SUCCESS 添加自定义 feeds: $entry"
+    else
+        echo -e "$ICON_WARN feeds 已存在: $entry，无需重复添加。"
+    fi
+done
 
 # Init feeds
 [ "$(whoami)" = "runner" ] && group "feeds update -a"
