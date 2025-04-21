@@ -96,8 +96,7 @@ git clone https://github.com/wixxm/wikjxwrt-coremark feeds/packages/utils/corema
 
 # sysinfo ssh
 git clone https://github.com/wixxm/WikjxWrt-ssh temp_ssh_repo
-mkdir -p "$(dirname /feeds/packages/utils/bash/files/etc/profile.d/sysinfo.sh)"
-mv temp_ssh_repo/sysinfo.sh /feeds/packages/utils/bash/files/etc/profile.d/sysinfo.sh
+mv temp_ssh_repo/sysinfo.sh feeds/packages/utils/bash/files/etc/profile.d/sysinfo.sh
 rm -rf temp_ssh_repo
 
 # luci-compat - fix translation
