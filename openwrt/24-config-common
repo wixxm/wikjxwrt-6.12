@@ -84,6 +84,7 @@ CONFIG_NGINX_STREAM_REAL_IP=y
 
 ### APPS
 CONFIG_PACKAGE_luci-app-airconnect=y
+CONFIG_PACKAGE_luci-app-ota=y
 CONFIG_PACKAGE_luci-app-nikki=y
 CONFIG_PACKAGE_luci-app-netdata=y
 CONFIG_PACKAGE_luci-app-lucky=y
