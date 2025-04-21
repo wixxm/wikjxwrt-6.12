@@ -252,13 +252,13 @@ rm -rf ../master
 # Init feeds
 [ "$(whoami)" = "runner" ] && group "feeds install -a"
 ./scripts/feeds install -a
+./scripts/feeds install -a  # 第二次执行
 [ "$(whoami)" = "runner" ] && endgroup
 
 # 注释自定义 feeds
 for entry in "$WIKJXWRT_ENTRY" "$PASSWALL_PACKAGES_ENTRY" "$PASSWALL_ENTRY"; do
     sed -i "s|^$entry|#$entry|" "feeds.conf.default" || error "注释自定义 feeds 失败: $entry"
 done
-
 
 # Load devices Config
 if [ "$platform" = "x86_64" ]; then
