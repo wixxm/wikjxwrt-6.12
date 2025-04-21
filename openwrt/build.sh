@@ -214,6 +214,11 @@ done
 ./scripts/feeds install -a
 [ "$(whoami)" = "runner" ] && endgroup
 
+# 注释自定义 feeds
+for entry in "$WIKJXWRT_ENTRY" "$PASSWALL_PACKAGES_ENTRY" "$PASSWALL_ENTRY"; do
+    sed -i "s|^$entry|#$entry|" "$FEEDS_FILE" || error "注释自定义 feeds 失败: $entry"
+done
+
 # loader dl
 if [ -f ../dl.gz ]; then
     tar xf ../dl.gz -C .
