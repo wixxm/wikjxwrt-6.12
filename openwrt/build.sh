@@ -252,7 +252,7 @@ rm -rf ../master
 # Init feeds
 [ "$(whoami)" = "runner" ] && group "feeds install -a"
 ./scripts/feeds install -a
-./scripts/feeds install -a  # 第二次执行
+./scripts/feeds install -a
 [ "$(whoami)" = "runner" ] && endgroup
 
 # 注释自定义 feeds
