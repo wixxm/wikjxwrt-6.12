@@ -9,7 +9,7 @@ rm -rf feeds/packages/lang/node
 git clone https://$github/sbwml/feeds_packages_lang_node-prebuilt feeds/packages/lang/node -b packages-24.10
 
 # default settings
-git clone https://$github/sbwml/default-settings package/new/default-settings -b openwrt-24.10
+git clone https://$github/wixxm/default-settings package/new/default-settings -b main
 
 # wwan
 git clone https://github.com/sbwml/wwan-packages package/new/wwan
