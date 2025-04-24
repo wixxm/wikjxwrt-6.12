@@ -84,7 +84,6 @@ CONFIG_NGINX_STREAM_REAL_IP=y
 
 ### APPS
 CONFIG_PACKAGE_luci-app-airconnect=y
-CONFIG_PACKAGE_luci-app-statistics=y
 CONFIG_PACKAGE_luci-app-arpbind=y
 CONFIG_PACKAGE_luci-app-openclash=y
 CONFIG_PACKAGE_luci-app-wrtbwmon=y
