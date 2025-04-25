@@ -1,8 +1,6 @@
-<p align="center">
-  <img width="400px" src="https://github.com/user-attachments/assets/6d37cd69-a232-4444-9f91-30e5942a8938" />
-</p>
 
-<h1 align="center">WikjxWrt-24.10-6.12</h1>
+
+<h1 align="center">WikjxWrt-24.10 - [Linux 6.12 LTS](https://kernel.org/)</h1>
 
 <p align="center">
   <b>基于原生 <a href="https://github.com/openwrt/openwrt" target="_blank" >OpenWrt</a> 更改与优化的固件，提供高效、稳定的使用体验！</b>
