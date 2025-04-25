@@ -160,3 +160,8 @@ export NO_KMOD=y
 
 ---------------
 
+### 特别致谢：
+
+#### 开源项目
+- [OpenWrt](https://github.com/openwrt/openwrt)
+- [r4s_build_script](https://github.com/sbwml/r4s_build_script/tree/openwrt-23.05)
