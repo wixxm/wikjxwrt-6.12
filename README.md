@@ -14,17 +14,10 @@
 
 ---------------
 
-## 基于 Linux 6.6/6.12 LTS 固件下载:
+## 基于 Linux 6.12 LTS 固件下载:
 
-#### NanoPi R4S: https://r4s.cooluc.com
 
-#### NanoPi R5S/R5C: https://r5s.cooluc.com
-
-#### X86_64: https://x86.cooluc.com
-
-#### Snapshot 24.10: https://snapshot.cooluc.com
-
-#### 构建来源: https://github.com/sbwml/builder
+#### X86_64: https://op.055553.xyz/
 
 ---------------
 
