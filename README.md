@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <b>感谢<a href="https://github.com/sbwml/r4s_build_script" target="_blank" >sbwml   </b>
+  <b>基于原生 <a href="https://github.com/sbwml/r4s_build_script" target="_blank" >sbwml/a> 更改与优化的固件，提供高效、稳定的使用体验感谢<a 
 </p>
 
 ---------------
