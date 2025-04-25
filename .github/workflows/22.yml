@@ -130,6 +130,39 @@ jobs:
         cd openwrt
         echo "latest_release=$tags" >>$GITHUB_ENV
 
+    - name: List openwrt/bin/targets/*/* contents for debugging
+      run: |
+        # 列出 openwrt/bin/targets 目录下的内容
+        echo "Listing contents of openwrt/bin/targets/"
+        ls -R openwrt/bin/targets/
+
+        # 如果存在子目录，列出其内容
+        echo "Listing contents of openwrt/bin/targets/*/*:"
+        ls -R openwrt/bin/targets/*/* || echo "No matching directories found."
+
+        # 打印当前工作目录
+        echo "Current working directory: $PWD"
+    
+        # 打印文件类型和大小
+        echo "File types and sizes in openwrt/bin/targets/*/*:"
+        find openwrt/bin/targets/*/* -type f -exec ls -lh {} \;
+
+        # 如果 openwrt/bin/targets/*/* 不存在，检查 openwrt 目录是否存在
+        echo "Checking if 'openwrt' directory exists..."
+        if [ -d "openwrt" ]; then
+          echo "'openwrt' directory found."
+      
+        # 继续检查 openwrt/bin/targets/x86/64 是否存在
+        echo "Checking if 'openwrt/bin/targets/x86/64' exists..."
+        if [ -d "openwrt/bin/targets/x86/64" ]; then
+          echo "'openwrt/bin/targets/x86/64' directory found."
+        else
+          echo "'openwrt/bin/targets/x86/64' directory not found."
+        fi
+        else
+          echo "'openwrt' directory not found."
+        fi
+        
     - name: Check space usage
       if: (!cancelled())
       run: df -hT
