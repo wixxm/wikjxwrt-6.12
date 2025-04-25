@@ -8,7 +8,9 @@
   <b>基于原生 <a href="https://github.com/openwrt/openwrt" target="_blank" >OpenWrt</a> 更改与优化的固件，提供高效、稳定的使用体验！</b>
 </p>
 
-### ：https://init2.cooluc.com
+<p align="center">
+  <b>感谢大佬的开源 <a href="https://github.com/sbwml/r4s_build_script" target="_blank" >OpenWrt</a> </b>
+</p>
 
 ---------------
 
