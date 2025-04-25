@@ -153,7 +153,6 @@ jobs:
 
     - name: Generate release tag
       id: tag
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
         # 生成带有随机前缀的标签（🌈wikjxwrt-YYYYMMDD）
         DATE_TAG=$(date +"%Y%m%d")
@@ -189,7 +188,6 @@ jobs:
 
     - name: Remove old Releases
       uses: dev-drprasad/delete-older-releases@master
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
         keep_latest: 10
         delete_tags: true
