@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <b>感谢大佬的开源 <a href="https://github.com/sbwml/r4s_build_script" target="_blank" >OpenWrt</a> </b>
+  <b>感谢sbwml大佬的开源仓库 <a href="https://github.com/sbwml/r4s_build_script" target="_blank" >sbwml</a> </b>
 </p>
 
 ---------------
