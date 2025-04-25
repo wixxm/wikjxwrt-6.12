@@ -1,4 +1,13 @@
-# WikjxWrt X86_64 OpenWrt-6.12 
+<p align="center">
+  <img width="400px" src="https://github.com/user-attachments/assets/6d37cd69-a232-4444-9f91-30e5942a8938" />
+</p>
+
+<h1 align="center">OpenWrt for FriendlyElec NanoPi R4S / R5S & X86_64 & Netgear R8500</h1>
+
+<p align="center">
+  <img width="300px" src="https://cdn.cooluc.com/r4s/r5s_.webp" />
+</p>
+
 <p align="center">
   <b>基于原生 <a href="https://github.com/openwrt/openwrt" target="_blank" >OpenWrt</a> 更改与优化的固件，提供高效、稳定的使用体验！</b>
 </p>
