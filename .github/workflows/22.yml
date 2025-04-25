@@ -147,12 +147,13 @@ jobs:
         find . ! -name '*.bin' ! -name '*.img.gz' ! -name '*wikjxwrt'  -type f -delete 
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
+        echo "TIMESTAMP=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
     - name: Upload firmware directory
       uses: actions/upload-artifact@main
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        name: WikjxWrt_firmware-6.12-${{ env.TIMESTAMP }}
         path: ${{ env.FIRMWARE }}
 
     - name: Generate release tag
