@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <b>感谢<a href="https://github.com/sbwml/r4s_build_script" target="_blank" >sbwml大佬的开源仓库  </b>
+  <b>感谢<a href="https://github.com/sbwml/r4s_build_script" target="_blank" >sbwml 大佬的开源仓库  </b>
 </p>
 
 ---------------
