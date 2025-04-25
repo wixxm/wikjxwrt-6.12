@@ -1,0 +1,264 @@
+name: Build releases
+
+on:
+  workflow_dispatch:
+    inputs:
+      device:
+        description: 'Select the build device'
+        required: true
+        default: 'x86_64'
+        type: choice
+        options:
+          - 'armv8'
+          - 'nanopi-r4s'
+          - 'nanopi-r5s'
+          - 'netgear_r8500'
+          - 'x86_64'
+      version:
+        description: 'Select the build version'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - 'release'
+          - 'snapshot-24.10'
+      ccache:
+        description: 'Enable ccache (Use Cache to speed up next build)'
+        type: boolean
+        default: false
+      lan_addr:
+        description: 'Setting default LAN address'
+        required: true
+        default: '10.0.0.1'
+        type: string
+      build_options:
+        description: 'Build options (separate multiple options with spaces)'
+        required: false
+        default: 'BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y ENABLE_MOLD=y KERNEL_CLANG_LTO=y'
+        type: string
+
+jobs:
+  build:
+    name: Build ${{ github.event.inputs.device }}
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      continue-on-error: true
+      uses: actions/checkout@main
+      with:
+        path: r4s_build_script
+
+    - name: Setup variables
+      run: |
+        sudo timedatectl set-timezone 'Asia/Shanghai'
+        git config --global user.name 'actions'
+        git config --global user.email 'action@github.com'
+        echo build_dir="/builder" >> "$GITHUB_ENV"
+        [ "${{ github.event.inputs.version }}" = release ] && echo build_version="rc2" >> "$GITHUB_ENV" || echo build_version="dev" >> "$GITHUB_ENV"
+
+    - name: Show system
+      run: |
+        echo -e "\n\e[1;32mCPU:\e[0m"
+        echo "$(grep 'model name' /proc/cpuinfo | head -1 | awk -F ': ' '{print $2}') ($(grep 'cpu MHz' /proc/cpuinfo | head -1 | awk -F ': ' '{print $2}')MHz) x $(grep processor /proc/cpuinfo  | wc -l)"
+        echo -e "\n\e[1;32mMemory:\e[0m"
+        free -h
+        echo -e "\n\e[1;32mStorage:\e[0m"
+        df -Th / /mnt
+        echo -e "\n\e[1;32mSystem:\e[0m"
+        lsb_release -a
+        echo -e "\n\e[1;32mKernel:\e[0m"
+        uname -a
+        echo
+
+    - name: Install Caddy Server
+      run: |
+        sudo curl -sL -o /usr/bin/caddy https://github.com/sbwml/r4s_build_script/releases/download/caddy/caddy
+        sudo chmod 755 /usr/bin/caddy
+        echo ":8080 {" > caddyfile
+        echo "    root * $(pwd)/r4s_build_script" >> caddyfile
+        echo "    file_server browse" >> caddyfile
+        echo "}" >> caddyfile
+        sudo /usr/bin/caddy start --config caddyfile --adapter caddyfile
+
+    - name: Free disk space
+      uses: sbwml/actions@free-disk
+      with:
+        build-mount-path: /builder
+
+    - name: Build System Setup
+      uses: sbwml/actions@openwrt-build-setup
+
+    - name: Install LLVM
+      uses: sbwml/actions@install-llvm
+
+    - name: Restore Cached
+      if: ${{ github.event.inputs.ccache == 'true' && github.event.inputs.device != 'armv8' && github.event.inputs.device != 'nanopi-r4s' }}
+      uses: actions/cache/restore@v4
+      with:
+        path: /builder/.ccache
+        key: openwrt-24.10-${{ github.event.inputs.device }}-ccache
+
+    - name: Restore Cached (releases)
+      if: ${{ github.event.inputs.ccache == 'true' && github.event.inputs.device == 'armv8' || github.event.inputs.device == 'nanopi-r4s' }}
+      continue-on-error: true
+      working-directory: /builder
+      run: |
+        curl -s https://api.github.com/repos/${{ github.repository }}/releases | grep 'browser_download_url' | grep ccache | grep ${{ github.event.inputs.device }} | awk -F '"' '{print $4}' | grep -v '^$' | xargs -n 1 wget -q
+        cat ${{ github.event.inputs.device }}.tar.* | tar -xf - || true
+        rm -rf ${{ github.event.inputs.device }}.tar.* || true
+        [ -d .ccache ] && cache_size=$(du -sb .ccache | awk '{print $1}') || cache_size=0
+        cache_size_mb=$(echo "scale=0; ${cache_size} / (1024 * 1024)" | bc)
+        echo "Cache Size: ~${cache_size_mb} MB (${cache_size} B)"
+        echo "Cache restored successfully"
+        echo "Cache restored from key: ${{ github.event.inputs.device }}"
+
+    - name: Compile OpenWrt
+      working-directory: /builder
+      id: compile
+      continue-on-error: true
+      env:
+        git_name: ${{ secrets.username }}
+        git_password: ${{ secrets.password }}
+      run: |
+        export ${{ github.event.inputs.build_options }} LAN=${{ github.event.inputs.lan_addr }} USE_GCC15=y
+        [ ${{ github.event.inputs.ccache }} = 'true' ] && export ENABLE_CCACHE=y
+        bash <(curl -sS http://127.0.0.1:8080/build.sh) ${{ env.build_version }} ${{ github.event.inputs.device }}
+        cd openwrt
+        echo "latest_release=$tags" >>$GITHUB_ENV
+
+    - name: Check space usage
+      if: (!cancelled())
+      run: df -hT
+
+    - name: Organize files
+      id: organize
+      run: |
+        cd /builder/openwrt/bin/targets/*/*
+        rm -rf packages
+        find . ! -name '*.bin' ! -name '*.img.gz' ! -name '*wikjxwrt'  -type f -delete 
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "status=success" >> $GITHUB_OUTPUT
+        echo "TIMESTAMP=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+
+    - name: Upload firmware directory
+      uses: actions/upload-artifact@main
+      if: steps.organize.outputs.status == 'success' && !cancelled()
+      with:
+        name: WikjxWrt_firmware-6.12-${{ env.TIMESTAMP }}
+        path: ${{ env.FIRMWARE }}
+
+    - name: Generate release tag
+      id: tag
+      run: |
+        # 生成带有随机前缀的标签（🌈wikjxwrt-YYYYMMDD）
+        DATE_TAG=$(date +"%Y%m%d")
+        PREFIXES=("🌈" "✨" "🚀" "🔥" "🌟" "⚡" "🎉" "🌻" "💡")  # 可选前缀符号
+        RAND_PREFIX="${PREFIXES[$RANDOM % ${#PREFIXES[@]}]}"
+        TAG_NAME="${RAND_PREFIX}wikjxwrt-${DATE_TAG}"  
+        # 输出 release_tag 变量
+        echo "release_tag=${TAG_NAME}" >> $GITHUB_OUTPUT
+        # 生成 Release 说明
+        echo "🚀 OpenWrt 24.10 编译完成！" > release.txt
+        echo "📅 编译日期: $(date +"%Y-%m-%d")" >> release.txt
+        echo "📦 源码版本: openwrt-24.10" >> release.txt
+        echo "🔗 固件仅包含 squashfs & ext4 格式" >> release.txt
+        echo "status=success" >> $GITHUB_OUTPUT
+
+    - name: Upload firmware to release
+      uses: softprops/action-gh-release@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+      with:
+        tag_name: ${{ steps.tag.outputs.release_tag }}
+        body_path: release.txt
+        files: ${{ env.FIRMWARE }}/*
+
+    - name: Delete workflow runs
+      uses: Mattraks/delete-workflow-runs@main
+      with:
+        retain_days: 5
+        keep_minimum_runs: 10
+      env:
+       GITHUB_TOKEN: ${{ secrets.GH_PAT }}  
+
+    - name: Remove old Releases
+      uses: dev-drprasad/delete-older-releases@master
+      with:
+        keep_latest: 10
+        delete_tags: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
+  generate-ota-json:
+    name: Generate OTA JSON
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest release info
+        id: get_release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const latest = await github.rest.repos.getLatestRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            const asset = latest.data.assets.find(a => 
+              a.name === 'wikjxwrt-x86-64-generic-ext4-combined-efi.img.gz');
+
+            if (!asset) {
+              core.setFailed("Target firmware not found in the latest release.");
+              return;
+            }
+
+            const crypto = require('crypto');
+            const response = await fetch(asset.browser_download_url);
+            const buffer = await response.arrayBuffer();
+            const sha256 = crypto.createHash('sha256').update(Buffer.from(buffer)).digest('hex');
+
+            const workflowRun = await github.rest.actions.getWorkflowRun({
+             owner: context.repo.owner,
+             repo: context.repo.repo,
+             run_id: process.env.GITHUB_RUN_ID,
+            });
+
+            const workflowStartTime = workflowRun.data.run_started_at;
+            const buildDate = Math.floor(new Date(workflowStartTime).getTime() / 1000);
+
+            const json = {
+              "x86_64": [
+                {
+                  "build_date": String(buildDate),
+                  "sha256sum": sha256,
+                  "url": asset.browser_download_url
+                }
+              ]
+            };
+
+            const fs = require('fs');
+            fs.mkdirSync('tmp-api', { recursive: true });
+            fs.writeFileSync('tmp-api/fw.json', JSON.stringify(json, null, 4));
+
+      - name: Checkout api branch
+        run: |
+          git fetch origin api:api
+          git checkout api
+          cp tmp-api/fw.json .
+          git config user.name "actions-user"
+          git config user.email "actions@github.com"
+          git add fw.json
+          git commit -m "Update fw.json @ $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git push origin api
