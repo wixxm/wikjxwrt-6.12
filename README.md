@@ -1,6 +1,9 @@
-# NanoPi R4S/R5S/R5C & X86_64 OpenWrt 简易构建脚本存档
+# WikjxWrt X86_64 OpenWrt-6.12 
+<p align="center">
+  <b>基于原生 <a href="https://github.com/openwrt/openwrt" target="_blank" >OpenWrt</a> 更改与优化的固件，提供高效、稳定的使用体验！</b>
+</p>
 
-### 存档来自：https://init2.cooluc.com
+### ：https://init2.cooluc.com
 
 ---------------
 
