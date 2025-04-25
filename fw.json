@@ -1,1 +1,9 @@
-
+{
+    "x86_64": [
+        {
+            "build_date": "1745582507",
+            "sha256sum": "6e3066f7e578223986740ace67f353200d774c750a4f563e435a4029925d7818",
+            "url": "https://github.com/wixxm/wikjxwrt-6.12/releases/download/%F0%9F%94%A5wikjxwrt-20250425/wikjxwrt-x86-64-generic-ext4-combined-efi.img.gz"
+        }
+    ]
+}
