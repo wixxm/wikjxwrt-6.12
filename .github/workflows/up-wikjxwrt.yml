@@ -1,0 +1,90 @@
+name: Sync r4s_build_script
+
+permissions:
+  contents: write  # 允许写入内容
+
+on:
+  push:
+    paths:
+      - '.github/workflows/sync.yml'  # 监听该文件的更改
+  schedule:
+    - cron: '0 */12 * * *'  # 每12小时运行一次
+  workflow_dispatch:  # 支持手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 克隆目标仓库 sbwml/r4s_build_script
+      - name: Clone r4s_build_script Repository
+        run: |
+          git clone https://github.com/sbwml/r4s_build_script.git r4s_build_script
+          cd r4s_build_script
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # 2. 克隆你的仓库 wixxm/wikjxwrt-6.12
+      - name: Clone Your Repository
+        env:
+          PAT: ${{ secrets.PAT_TOKEN }}
+        run: |
+          git clone https://x-access-token:${PAT}@github.com/wixxm/wikjxwrt-6.12.git target_repo
+
+      # 3. 备份 .github、scripts 文件夹和需要保留的文件
+      - name: Backup Existing Files
+        run: |
+          mkdir -p backup
+          # 备份 .github 文件夹
+          if [ -d "target_repo/.github" ]; then
+            mv target_repo/.github backup/github_backup
+          fi
+          # 备份 scripts 文件夹
+          if [ -d "target_repo/scripts" ]; then
+            mv target_repo/scripts backup/scripts_backup
+          fi
+          # 备份需要保留的特定文件
+          mkdir -p backup/files
+          cp -r target_repo/openwrt/24-config-musl-x86 backup/files/
+          cp -r target_repo/openwrt/24-config-common backup/files/
+          cp -r target_repo/openwrt/build.sh backup/files/
+
+      # 4. 将 r4s_build_script 仓库的内容同步到你的仓库
+      - name: Sync r4s_build_script Changes to Your Repo
+        run: |
+          rsync -av --delete --exclude='.git' --exclude='.github' --exclude='scripts' --exclude='openwrt/24-config-musl-x86' --exclude='openwrt/24-config-common' --exclude='openwrt/build.sh' r4s_build_script/ target_repo/
+
+      # 5. 恢复备份的文件和文件夹
+      - name: Restore Backup Files
+        run: |
+          # 恢复 .github 文件夹
+          if [ -d "backup/github_backup" ]; then
+            mv backup/github_backup target_repo/.github
+          fi
+          # 恢复 scripts 文件夹
+          if [ -d "backup/scripts_backup" ]; then
+            mv backup/scripts_backup target_repo/scripts
+          fi
+          # 恢复其他文件
+          cp -r backup/files/24-config-musl-x86 target_repo/openwrt/
+          cp -r backup/files/24-config-common target_repo/openwrt/
+          cp -r backup/files/build.sh target_repo/openwrt/
+
+      # 6. 配置 Git 用户信息并提交更改
+      - name: Commit and Push Changes
+        env:
+          PAT: ${{ secrets.PAT_TOKEN }}
+        run: |
+          cd target_repo
+          git config user.name "wixxm"  # 修改为你的用户名
+          git config user.email "your_email@github.com"  # 修改为你的邮箱
+
+          # 设置时区为上海
+          export TZ="Asia/Shanghai"
+
+          # 获取当前日期和时间
+          timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+
+          # 提交并强制推送更改
+          git add .
+          git commit -m "🚀 Sync r4s_build_script - $timestamp" || echo "没有新的更改可提交"
+          git push origin HEAD:main --force
