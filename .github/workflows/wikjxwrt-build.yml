@@ -12,7 +12,7 @@ env:
 
 jobs:
   build:
-    name: Build ${{ env.device }}
+    name: Build WikjxWrt x86_64
     runs-on: ubuntu-24.04
     defaults:
       run:
