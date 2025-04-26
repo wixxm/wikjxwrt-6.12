@@ -7,8 +7,8 @@ env:
   device: x86_64
   version: release
   ccache: false
-  LAN_ADccache:DR: 192.168.88.1
-  BUILD_OPTIONS: BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y ENABLE_MOLD=y KERNEL_CLANG_LTO=y
+  lan_addr: 192.168.88.1
+  build_options: BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y ENABLE_MOLD=y KERNEL_CLANG_LTO=y
 
 jobs:
   build:
