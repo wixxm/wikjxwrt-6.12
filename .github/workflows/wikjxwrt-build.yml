@@ -135,9 +135,9 @@ jobs:
         # 输出 release_tag 变量
         echo "release_tag=${TAG_NAME}" >> $GITHUB_OUTPUT
         # 生成 Release 说明
-        echo "🚀 OpenWrt 24.10 编译完成！" > release.txt
+        echo "🚀 WikjxWrt-24.10-6.12 编译完成！" > release.txt
         echo "📅 编译日期: $(date +"%Y-%m-%dT%H:%M:%S")" >> release.txt
-        echo "📦 源码版本: openwrt-24.10-6.12" >> release.txt
+        echo "📦 源码版本: openwrt-24.10" >> release.txt
         echo "🔗 固件仅包含 squashfs & ext4 格式" >> release.txt
         echo "status=success" >> $GITHUB_OUTPUT
 
