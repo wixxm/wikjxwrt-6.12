@@ -1,31 +1,20 @@
+# NanoPi R4S/R5S/R5C & X86_64 OpenWrt 简易构建脚本存档
 
-
-<h1 align="center">WikjxWrt-24.10 - <a href="https://kernel.org" target="_blank" >Linux 6.12 LTS</a></h1>
-
-<p align="center">
-  <b>基于原生 <a href="https://github.com/openwrt/openwrt" target="_blank" >OpenWrt</a> 更改与优化的固件，提供高效、稳定的使用体验！</b>
-</p>
-
-<p align="center">
-  <b>感谢 <a href="https://github.com/sbwml/r4s_build_script" target="_blank" >sbwml</a> 大佬开源仓库 </b>
-</p>
+### 存档来自：https://init2.cooluc.com
 
 ---------------
 
-## 基于 Linux 6.12 LTS 固件下载:
+## 基于 Linux 6.6/6.12 LTS 固件下载:
 
+#### NanoPi R4S: https://r4s.cooluc.com
 
-#### X86_64: https://op.055553.xyz/
+#### NanoPi R5S/R5C: https://r5s.cooluc.com
 
+#### X86_64: https://x86.cooluc.com
 
-## 登录信息
-```
-地址：192.168.88.1（修改代码：vi /etc/config/network）
-用户：root
-密码：空
-```
----------------
+#### Snapshot 24.10: https://snapshot.cooluc.com
 
+#### 构建来源: https://github.com/sbwml/builder
 
 ---------------
 
@@ -33,6 +22,16 @@
 ```shell
 sudo apt-get update
 sudo apt-get install -y build-essential flex bison g++ gawk gcc-multilib g++-multilib gettext git libfuse-dev libncurses5-dev libssl-dev python3 python3-pip python3-ply python3-distutils python3-pyelftools rsync unzip zlib1g-dev file wget subversion patch upx-ucl autoconf automake curl asciidoc binutils bzip2 lib32gcc-s1 libc6-dev-i386 uglifyjs msmtp texinfo libreadline-dev libglib2.0-dev xmlto libelf-dev libtool autopoint antlr3 gperf ccache swig coreutils haveged scons libpython3-dev jq
+```
+
+---------------
+
+## 授权构建
+#### 由于本源码具备后门被证实 [#92](https://github.com/sbwml/r4s_build_script/issues/92)，良心发现后，防止毒害社会不再允许任何人~~与狗~~直接构建😏
+#### 如果你得到授权，请在构建前执行以下命令
+
+```
+export git_name=账户名 git_password=密码
 ```
 
 ---------------
@@ -158,8 +157,101 @@ export NO_KMOD=y
 
 ---------------
 
-### 特别致谢：
+## 构建 OpenWrt 24.10 最新 Releases
 
-#### 开源项目
-- [OpenWrt](https://github.com/openwrt/openwrt)
-- [r4s_build_script](https://github.com/sbwml/r4s_build_script/tree/openwrt-23.05)
+### nanopi-r4s
+```shell
+# linux-6.12
+bash <(curl -sS https://init2.cooluc.com/build.sh) rc2 nanopi-r4s
+```
+
+### nanopi-r5s/r5c
+```shell
+# linux-6.12
+bash <(curl -sS https://init2.cooluc.com/build.sh) rc2 nanopi-r5s
+```
+
+### x86_64
+```shell
+# linux-6.12
+bash <(curl -sS https://init2.cooluc.com/build.sh) rc2 x86_64
+```
+
+## 构建 OpenWrt 24.10 开发版（24.10-SNAPSHOT）
+
+### nanopi-r4s
+```shell
+# linux-6.12
+bash <(curl -sS https://init2.cooluc.com/build.sh) dev nanopi-r4s
+```
+
+### nanopi-r5s/r5c
+```shell
+# linux-6.12
+bash <(curl -sS https://init2.cooluc.com/build.sh) dev nanopi-r5s
+```
+
+### x86_64
+```shell
+# linux-6.12
+bash <(curl -sS https://init2.cooluc.com/build.sh) dev x86_64
+```
+
+-----------------
+
+# 基于本仓库进行自定义构建 - 本地编译
+
+#### 如果你有自定义的需求，建议不要变更内核版本号，这样构建出来的固件可以直接使用 `opkg install kmod-xxxx`
+
+### 一、Fork 本仓库到自己 GitHub 存储库
+
+### 二、修改构建脚本文件：`openwrt/build.sh`（使用 Github Actions 构建时无需更改）
+
+将 init.cooluc.com 脚本默认连接替换为你的 github raw 连接，像这样 `https://raw.githubusercontent.com/你的用户名/r4s_build_script/refs/heads/master`
+
+```diff
+ # script url
+ if [ "$isCN" = "CN" ]; then
+-    export mirror=https://init.cooluc.com
++    export mirror=https://raw.githubusercontent.com/你的用户名/r4s_build_script/refs/heads/master
+ else
+-    export mirror=https://init2.cooluc.com
++    export mirror=https://raw.githubusercontent.com/你的用户名/r4s_build_script/refs/heads/master
+ fi
+```
+
+### 三、在本地 Linux 执行基于你自己仓库的构建脚本，即可编译所需固件
+
+#### nanopi-r4s openwrt-24.10
+```shell
+# linux-6.12
+bash <(curl -sS https://raw.githubusercontent.com/你的用户名/r4s_build_script/refs/heads/master/openwrt/build.sh) rc2 nanopi-r4s
+```
+
+#### nanopi-r5s/r5c openwrt-24.10
+```shell
+# linux-6.12
+bash <(curl -sS https://raw.githubusercontent.com/你的用户名/r4s_build_script/refs/heads/master/openwrt/build.sh) rc2 nanopi-r5s
+```
+
+#### x86_64 openwrt-24.10
+```shell
+# linux-6.12
+bash <(curl -sS https://raw.githubusercontent.com/你的用户名/r4s_build_script/refs/heads/master/openwrt/build.sh) rc2 x86_64
+```
+
+-----------------
+
+# 使用 Github Actions 构建
+
+### 一、Fork 本仓库到自己 GitHub 存储库
+
+### 二、构建固件
+
+- 在存储库名称下，单击（<img src="https://github.com/user-attachments/assets/f1db14da-2dd9-4f10-8e37-d92ef9651912" alt="Actions"> Actions）。
+  
+- 在左侧边栏中，单击要运行的工作流的名称：**Build releases**。
+  
+- 在工作流运行的列表上方，单击“**Run workflow**”按钮，选择要构建的设备固件并运行工作流。
+  
+  ![image](https://github.com/user-attachments/assets/3eae2e9f-efe6-48ad-8e9d-39c176fcd71c)
