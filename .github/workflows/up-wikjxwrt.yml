@@ -47,6 +47,7 @@ jobs:
           cp -r target_repo/openwrt/24-config-musl-x86 backup/files/
           cp -r target_repo/openwrt/24-config-common backup/files/
           cp -r target_repo/openwrt/build.sh backup/files/
+          cp -r target_repo/README.md backup/files/
 
       # 4. 将 r4s_build_script 仓库的内容同步到你的仓库
       - name: Sync r4s_build_script Changes to Your Repo
@@ -68,6 +69,7 @@ jobs:
           cp -r backup/files/24-config-musl-x86 target_repo/openwrt/
           cp -r backup/files/24-config-common target_repo/openwrt/
           cp -r backup/files/build.sh target_repo/openwrt/
+           cp -r backup/files/README.md target_repo/
 
       # 6. 配置 Git 用户信息并提交更改
       - name: Commit and Push Changes
