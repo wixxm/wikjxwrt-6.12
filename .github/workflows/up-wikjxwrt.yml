@@ -1,15 +1,12 @@
 name: Sync r4s_build_script
 
 permissions:
-  contents: write  # 允许写入内容
+  contents: write  
 
 on:
-  push:
-    paths:
-      - '.github/workflows/sync.yml'  # 监听该文件的更改
+  workflow_dispatch:  
   schedule:
-    - cron: '0 */12 * * *'  # 每12小时运行一次
-  workflow_dispatch:  # 支持手动触发
+    - cron: '0 */8 * * *'  
 
 jobs:
   sync:
