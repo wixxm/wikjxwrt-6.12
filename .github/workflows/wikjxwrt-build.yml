@@ -1,41 +1,14 @@
 name: Build releases
 
 on:
+  repository_dispatch:
   workflow_dispatch:
-    inputs:
-      device:
-        description: 'Select the build device'
-        required: true
-        default: 'x86_64'
-        type: choice
-        options:
-          - 'armv8'
-          - 'nanopi-r4s'
-          - 'nanopi-r5s'
-          - 'netgear_r8500'
-          - 'x86_64'
-      version:
-        description: 'Select the build version'
-        required: true
-        default: 'release'
-        type: choice
-        options:
-          - 'release'
-          - 'snapshot-24.10'
-      ccache:
-        description: 'Enable ccache (Use Cache to speed up next build)'
-        type: boolean
-        default: false
-      lan_addr:
-        description: 'Setting default LAN address'
-        required: true
-        default: '10.0.0.1'
-        type: string
-      build_options:
-        description: 'Build options (separate multiple options with spaces)'
-        required: false
-        default: 'BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y ENABLE_MOLD=y KERNEL_CLANG_LTO=y'
-        type: string
+env:
+  DEVICE: x86_64
+  VERSION: release
+  CCACHE: false
+  LAN_ADDR: 192.168.88.1
+  BUILD_OPTIONS: BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y ENABLE_MOLD=y KERNEL_CLANG_LTO=y
 
 jobs:
   build:
