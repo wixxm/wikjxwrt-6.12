@@ -4,15 +4,15 @@ on:
   repository_dispatch:
   workflow_dispatch:
 env:
-  DEVICE: x86_64
-  VERSION: release
-  CCACHE: false
-  LAN_ADDR: 192.168.88.1
+  device: x86_64
+  version: release
+  ccache: false
+  LAN_ADccache:DR: 192.168.88.1
   BUILD_OPTIONS: BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y ENABLE_MOLD=y KERNEL_CLANG_LTO=y
 
 jobs:
   build:
-    name: Build ${{ github.event.inputs.device }}
+    name: ${{ env.device }}
     runs-on: ubuntu-24.04
     defaults:
       run:
