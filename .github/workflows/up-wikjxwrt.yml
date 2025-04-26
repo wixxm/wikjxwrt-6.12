@@ -26,7 +26,7 @@ jobs:
       # 2. 克隆你的仓库 wixxm/wikjxwrt-6.12
       - name: Clone Your Repository
         env:
-          PAT: ${{ secrets.PAT_TOKEN }}
+          PAT: ${{ secrets.GH_PAT }}
         run: |
           git clone https://x-access-token:${PAT}@github.com/wixxm/wikjxwrt-6.12.git target_repo
 
@@ -72,7 +72,7 @@ jobs:
       # 6. 配置 Git 用户信息并提交更改
       - name: Commit and Push Changes
         env:
-          PAT: ${{ secrets.PAT_TOKEN }}
+          PAT: ${{ secrets.GH_PAT }}
         run: |
           cd target_repo
           git config user.name "wixxm"  # 修改为你的用户名
