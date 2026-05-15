@@ -1,7 +1,7 @@
-From 0649947c4c8d0b21bd40124c3d2bd004c0118549 Mon Sep 17 00:00:00 2001
+From df1d29a8fff76006f150c5946fa2bd638da16c40 Mon Sep 17 00:00:00 2001
 From: sbwml <admin@cooluc.com>
 Date: Thu, 29 May 2025 17:12:37 +0800
-Subject: [PATCH 11/13] config/include: image: add support for squashfs zstd
+Subject: [PATCH 11/16] config/include: image: add support for squashfs zstd
  compression algorithm
 
 Signed-off-by: sbwml <admin@cooluc.com>
@@ -29,7 +29,7 @@ index 8094136..3721292 100644
  		bool "ubifs"
  		default y if USES_UBIFS
 diff --git a/include/image.mk b/include/image.mk
-index 38005b2..078d2f7 100644
+index e62468c..801b63d 100644
 --- a/include/image.mk
 +++ b/include/image.mk
 @@ -100,6 +100,10 @@ ifeq ($(CONFIG_SQUASHFS_XZ),y)

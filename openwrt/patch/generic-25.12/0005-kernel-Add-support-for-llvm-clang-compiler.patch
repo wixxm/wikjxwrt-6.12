@@ -1,7 +1,7 @@
-From 5019245030b26f3602095de80ab7fc43051e37a2 Mon Sep 17 00:00:00 2001
+From e185bb50c828f49cf0858019fbb90d95dd53f950 Mon Sep 17 00:00:00 2001
 From: sbwml <admin@cooluc.com>
 Date: Fri, 4 Oct 2024 10:51:22 +0800
-Subject: [PATCH 05/13] kernel: Add support for llvm/clang compiler
+Subject: [PATCH 05/16] kernel: Add support for llvm/clang compiler
 
 Signed-off-by: sbwml <admin@cooluc.com>
 ---
@@ -29,7 +29,7 @@ index 3fe78f3..46287bf 100644
  		string "Use external kernel tree" if DEVEL
  		default ""
 diff --git a/include/kernel.mk b/include/kernel.mk
-index 6ef7663..1648a6f 100644
+index 5ccc21c..ef6d473 100644
 --- a/include/kernel.mk
 +++ b/include/kernel.mk
 @@ -35,7 +35,7 @@ else
@@ -60,7 +60,7 @@ index 6ef7663..1648a6f 100644
  	-nostdinc $(if $(DUMP),, -isystem $(shell $(TARGET_CC) -print-file-name=include))
  
 diff --git a/include/package.mk b/include/package.mk
-index 5392bdf..5bcc4f3 100644
+index a8278d0..55e2cd1 100644
 --- a/include/package.mk
 +++ b/include/package.mk
 @@ -23,6 +23,10 @@ else

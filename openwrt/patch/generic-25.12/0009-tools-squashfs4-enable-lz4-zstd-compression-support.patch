@@ -1,7 +1,7 @@
-From 2959e6624a39b223527d654828022fe1d79ea6fc Mon Sep 17 00:00:00 2001
+From 4724f865535cdde0ed07cbc3a4b6763b2b705018 Mon Sep 17 00:00:00 2001
 From: sbwml <admin@cooluc.com>
 Date: Sun, 21 Dec 2025 15:14:08 +0800
-Subject: [PATCH 09/13] tools: squashfs4: enable lz4 & zstd compression support
+Subject: [PATCH 09/16] tools: squashfs4: enable lz4 & zstd compression support
 
 Signed-off-by: sbwml <admin@cooluc.com>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: sbwml <admin@cooluc.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/tools/squashfs4/Makefile b/tools/squashfs4/Makefile
-index 6b88735..31c884a 100644
+index 43891a1..3ce873b 100644
 --- a/tools/squashfs4/Makefile
 +++ b/tools/squashfs4/Makefile
 @@ -24,9 +24,9 @@ include $(INCLUDE_DIR)/host-build.mk
