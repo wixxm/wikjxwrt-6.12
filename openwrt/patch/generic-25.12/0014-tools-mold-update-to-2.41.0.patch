@@ -1,7 +1,7 @@
-From 4059c0ddfd95f0678892c2adf0566dc2c7cd251f Mon Sep 17 00:00:00 2001
+From 39c5582d99c6c52d55dadf060c2045b378320530 Mon Sep 17 00:00:00 2001
 From: sbwml <admin@cooluc.com>
 Date: Mon, 11 May 2026 15:41:56 +0800
-Subject: [PATCH 15/16] tools: mold: update to 2.41.0
+Subject: [PATCH 2/2] tools: mold: update to 2.41.0
 
 Signed-off-by: sbwml <admin@cooluc.com>
 ---
@@ -29,5 +29,5 @@ index 8c3e33f..ff1f5c7 100644
  include $(INCLUDE_DIR)/host-build.mk
  include $(INCLUDE_DIR)/cmake.mk
 -- 
-2.43.5
+2.47.3
 

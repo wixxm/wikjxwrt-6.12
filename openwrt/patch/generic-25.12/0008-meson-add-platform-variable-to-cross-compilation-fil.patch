@@ -1,7 +1,7 @@
-From f9c19545110e5d82e03f32798aa8a9a745debf01 Mon Sep 17 00:00:00 2001
+From 643e0796f188993c5caea1655c4836aae8307336 Mon Sep 17 00:00:00 2001
 From: sbwml <admin@cooluc.com>
 Date: Fri, 4 Oct 2024 10:58:54 +0800
-Subject: [PATCH 08/16] meson: add platform variable to cross-compilation file
+Subject: [PATCH 08/13] meson: add platform variable to cross-compilation file
 
 Signed-off-by: sbwml <admin@cooluc.com>
 ---

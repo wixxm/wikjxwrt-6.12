@@ -1,7 +1,7 @@
-From e1adaa8e0ef391501f63384ec45a1527617f7668 Mon Sep 17 00:00:00 2001
+From 687ed9e452ea3ce1508af0c661eba9019dc5d16d Mon Sep 17 00:00:00 2001
 From: sbwml <admin@cooluc.com>
 Date: Fri, 4 Oct 2024 10:56:57 +0800
-Subject: [PATCH 06/16] build: kernel: add out-of-tree kernel config
+Subject: [PATCH 06/13] build: kernel: add out-of-tree kernel config
 
 Signed-off-by: sbwml <admin@cooluc.com>
 ---

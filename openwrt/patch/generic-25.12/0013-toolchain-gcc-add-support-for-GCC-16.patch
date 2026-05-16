@@ -1,7 +1,7 @@
-From 917f709ab504912c44a407e512b720cd67beb018 Mon Sep 17 00:00:00 2001
+From a9d317aa12af81e7c829ce9a01abcd29cb9f8cc1 Mon Sep 17 00:00:00 2001
 From: sbwml <admin@cooluc.com>
 Date: Mon, 11 May 2026 15:40:54 +0800
-Subject: [PATCH 14/16] toolchain: gcc: add support for GCC-16
+Subject: [PATCH 1/2] toolchain: gcc: add support for GCC-16
 
 Signed-off-by: sbwml <admin@cooluc.com>
 ---
@@ -883,5 +883,5 @@ index 0000000..73bb1ad
 ++
 ++const struct host_hooks host_hooks = HOST_HOOKS_INITIALIZER;
 -- 
-2.43.5
+2.47.3
 

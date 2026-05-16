@@ -1,7 +1,7 @@
-From fd7a48604a9a4f64ada2169c367743a05d8bce1a Mon Sep 17 00:00:00 2001
+From be2b8b3b012a549f8a0fc3d1c4fe84644ee65cf0 Mon Sep 17 00:00:00 2001
 From: sbwml <admin@cooluc.com>
 Date: Mon, 11 May 2026 18:10:42 +0800
-Subject: [PATCH 16/16] tools: build lz4 by default
+Subject: [PATCH] tools: build lz4 by default
 
 Signed-off-by: sbwml <admin@cooluc.com>
 ---

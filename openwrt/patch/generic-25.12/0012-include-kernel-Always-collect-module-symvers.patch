@@ -1,7 +1,7 @@
-From 4684517f3529a63868817cb3af7f3f6fb2a6c5a0 Mon Sep 17 00:00:00 2001
+From 13032f8109b35d761d61d0631b73b305299078f4 Mon Sep 17 00:00:00 2001
 From: sbwml <admin@cooluc.com>
 Date: Sun, 26 Oct 2025 16:12:19 +0800
-Subject: [PATCH 12/16] include: kernel: Always collect module symvers
+Subject: [PATCH 12/13] include: kernel: Always collect module symvers
 
 Signed-off-by: sbwml <admin@cooluc.com>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: sbwml <admin@cooluc.com>
  1 file changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/include/kernel.mk b/include/kernel.mk
-index ef6d473..3452bdb 100644
+index 1648a6f..f63f367 100644
 --- a/include/kernel.mk
 +++ b/include/kernel.mk
 @@ -160,13 +160,9 @@ PKG_EXTMOD_SUBDIRS ?= .
